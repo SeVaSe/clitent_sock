@@ -1,4 +1,5 @@
 import socket
+import select
 
 # создание сокета клиента
 HOST_SERVER, PORT_SERVER = 'localhost', 12345
@@ -15,9 +16,22 @@ while True:
     # отправка
     sock_client.sendall(cmd.encode('utf-8')) # как я понял, sendall - он более надежный в отправке сообщения на сервак
 
-    # получение ответа
-    print(f'Ответ сервера: [- {sock_client.recv(1024).decode("utf-8")} -]')
+    # ожидание данных для чтения
+    # символы '_' для игнорирования этих списков, так как они не интересуют в данном контексте
+    # select.select() принимает три списка: readList, writeList, excepList
+    readable = select.select([sock_client], [], [], 1.0) # ожидание в течение 1 секунды
 
+    '''Это добавление в код позволяет контролировать, что происходит, когда ожидаемые данные 
+    отсутствуют или когда происходит блокировка при чтении из сокета'''
+
+    if readable:
+        answer = sock_client.recv(1024).decode("utf-8")
+        if answer.strip() == '':
+            print('Ответ сервера: [- пусто -]')
+        else:
+            print(f'Ответ сервера: [- {answer.strip()} -]')
+    else:
+        print('Ответ сервера: [- пусто -]')
 
 
 
