@@ -53,7 +53,7 @@ def send_command():
     # ожидание данных для чтения
     # символы '_' для игнорирования этих списков, так как они не интересуют в данном контексте
     # select.select() принимает три списка: readList, writeList, excepList
-    readable, _, _ = select.select([sock_client], [], [], 3.0)  # ожидание в течение 1 секунды
+    readable, _, _ = select.select([sock_client], [], [], 1.5)  # ожидание в течение 1 секунды
 
     if readable:
         # получение ответа
