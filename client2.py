@@ -17,7 +17,7 @@ def colorize(text, color_code):
 
 
 # создание сокета клиента
-HOST_SERVER, PORT_SERVER = '192.168.0.103', 12345
+HOST_SERVER, PORT_SERVER = '192.168.0.103pin', 12345
 sock_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # подключение клиента к серваку
