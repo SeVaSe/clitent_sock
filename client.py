@@ -25,6 +25,7 @@ sock_client.connect((HOST_SERVER, PORT_SERVER))
 print(colorize(f'Клиент был подключен к серверу: HOST - [*{HOST_SERVER}*],  PORT - [*{PORT_SERVER}*]', 'green'), '\n\n')
 
 
+# функция отправки запросов и получения от них ответа
 def send_message():
     while True:
         # ввод комманды
