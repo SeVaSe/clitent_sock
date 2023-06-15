@@ -42,7 +42,6 @@ def download_file(file_name):
 
 
 
-
 # Функция отправки запросов и получения ответа
 def send_message():
     while True:
@@ -55,6 +54,7 @@ def send_message():
         if cmd.startswith('download'):
             _, file_name = cmd.split(' ', 1)
             download_file(file_name)
+            print(f'Файл был успешно загружен на клиент\n')
             continue
 
 
