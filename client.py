@@ -13,9 +13,6 @@ def colorize(text, color_code):
     else:
         return f'{text}'
 
-
-
-
 # создание сокета клиента
 HOST_SERVER, PORT_SERVER = '192.168.0.103', 12345
 sock_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,14 +22,40 @@ sock_client.connect((HOST_SERVER, PORT_SERVER))
 print(colorize(f'Клиент был подключен к серверу: HOST - [*{HOST_SERVER}*],  PORT - [*{PORT_SERVER}*]', 'green'), '\n\n')
 
 
+
+
+
+
+
 # функция отправки запросов и получения от них ответа
 def send_message():
+    # функция загрузки файла с сервера
+    def download_file(file_name):
+        # отправка команды на сервер для загрузки файла
+        sock_client.sendall(f'download {file_name}'.encode('utf-8'))
+        # прием файла от сервера
+        file_data = sock_client.recv(1024)
+
+        # сохранение файла на клиенте
+        with open(file_name, 'wb') as file:
+            file.write(file_data)
+
+
     while True:
         # ввод комманды
         cmd = input(colorize('Введите консольную команду: ', 'yellow'))
 
         # отправка
         sock_client.sendall(cmd.encode('utf-8')) # как я понял, sendall - он более надежный в отправке сообщения на сервак
+
+
+        if cmd.startswith('download'):
+            _, file_name = cmd.split(' ', 1)
+            download_file(file_name)
+            continue
+
+        elif cmd.startswith('upload'):
+            pass
 
         # ожидание данных для чтения
         # символы '_' для игнорирования этих списков, так как они не интересуют в данном контексте
