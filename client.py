@@ -41,6 +41,18 @@ def download_file(file_name):
                 break
 
 
+# функция отправки файла на сервер
+def upload_file(file_path):
+    with open(file_path, 'rb') as file:
+        while True:
+            file_data = file.read(1024)
+            if not file_data:
+                break
+            sock_client.sendall(file_data)
+
+
+
+
 
 # Функция отправки запросов и получения ответа
 def send_message():
@@ -55,6 +67,11 @@ def send_message():
             _, file_name = cmd.split(' ', 1)
             download_file(file_name)
             print(f'Файл был успешно загружен на клиент\n')
+            continue
+        elif cmd.startswith('upload'):
+            _, file_path = cmd.split(' ', 1)
+            upload_file(file_path)
+            print(f'Файл был успешно отправлен на сервер\n')
             continue
 
 
