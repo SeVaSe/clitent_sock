@@ -88,6 +88,9 @@ def send_message():
             elif answer == 'Клиент отключен':
                 print(f'{colorize(answer.upper(), "red")}\n')
                 break
+            elif answer == 'Сервер был выключен':
+                print(f'{colorize(answer.upper(), "red")}\n')
+                break
             else:
                 print(f'{colorize("Ответ сервера: ", "green")}[- {answer.strip()} -]\n')
         else:
