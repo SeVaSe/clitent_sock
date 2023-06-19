@@ -32,6 +32,12 @@ print(colorize(f'Клиент был подключен к серверу: HOST 
 
 # поиск файла и копирование
 def find_copy_file(file_name, destin_path):
+    # проверка файла, на то, что есть ли он в текущей дирректории
+    destin_file_now = os.path.join("C:\PYTHON_\_PROJECT_PYTHON\Python_Project_Other\clitent_sock", file_name)
+    if os.path.exists(destin_file_now):
+        print(f'{colorize("Файл уже существует в целевой директории: ", "green")}{colorize(destin_path, "red")}\n')
+        return upload_file(file_name, file_flag=False)
+
     # поиск файла на пк
     for root, dirs, files in os.walk('/'):
         if file_name in files:
@@ -48,6 +54,8 @@ def find_copy_file(file_name, destin_path):
 def download_file(file_name):
     # Отправка команды на сервер для загрузки файла
     sock_client.sendall(f'download {file_name}'.encode('utf-8'))
+    sock_path = sock_client.recv(1024)
+
     # Прием файла от сервера
     with open(file_name, 'wb') as file:
         while True:
@@ -62,18 +70,29 @@ def download_file(file_name):
 
 
 
-# функция отправки файла на сервер
-def upload_file(file_name):
-    # создаем путь куда сохраним наш файл
-    destin_path = os.path.join("C:/PYTHON_/_PROJECT_PYTHON/Python_Project_Other/clitent_sock", file_name)
 
-    if find_copy_file(file_name, destin_path):
-        with open(destin_path, 'rb') as file:
+# функция отправки файла на сервер
+def upload_file(file_name, file_flag=True):
+    if file_flag:
+        # создаем путь куда сохраним наш файл
+        destin_path = os.path.join("C:/PYTHON_/_PROJECT_PYTHON/Python_Project_Other/clitent_sock/cacheCL", file_name)
+
+        if find_copy_file(file_name, destin_path):
+            # чтение нового файла и отправка его содержимого клиенту
+            with open(destin_path, 'rb') as file:
+                while True:
+                    file_data = file.read(1024)
+                    if not file_data:
+                        break
+                    sock_client.sendall(file_data)
+    else:
+        with open(file_name, 'rb') as file:
             while True:
                 file_data = file.read(1024)
                 if not file_data:
                     break
                 sock_client.sendall(file_data)
+
 
 
 

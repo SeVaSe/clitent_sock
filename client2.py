@@ -1,6 +1,8 @@
+import os
 import socket
 import select
 import threading
+import shutil
 
 # Функция по окраске текста
 def colorize(text, color_code):
@@ -24,14 +26,40 @@ print(colorize(f'Клиент был подключен к серверу: HOST 
 
 
 
+
+
+
+
+# поиск файла и копирование
+def find_copy_file(file_name, destin_path):
+    # проверка файла, на то, что есть ли он в текущей дирректории
+    destin_file_now = os.path.join("C:\PYTHON_\_PROJECT_PYTHON\Python_Project_Other\clitent_sock", file_name)
+    if os.path.exists(destin_file_now):
+        print(f'{colorize("Файл уже существует в целевой директории: ", "green")}{colorize(destin_path, "red")}\n')
+        return upload_file(file_name, file_flag=False)
+
+    # поиск файла на пк
+    for root, dirs, files in os.walk('/'):
+        if file_name in files:
+            file_path = os.path.join(root, file_name)
+
+            # копирование файла в дирректорию сервака
+            shutil.copy2(file_path, destin_path)
+            print(f'{colorize("Файл скопирован в дирректорию: ", "green")}{colorize(destin_path, "red")}\n')
+            return True
+    print(f'{colorize("Файл был не найден на данном устройстве!", "red")}')
+    return False
+
 # Функция загрузки файла с сервера
 def download_file(file_name):
     # Отправка команды на сервер для загрузки файла
     sock_client.sendall(f'download {file_name}'.encode('utf-8'))
+    sock_path = sock_client.recv(1024)
+
     # Прием файла от сервера
     with open(file_name, 'wb') as file:
         while True:
-            readable, _, _ = select.select([sock_client], [], [], 1.0)
+            readable, _, _ = select.select([sock_client], [], [], 10.0)
             if readable:
                 file_data = sock_client.recv(1024)
                 if not file_data:
@@ -41,15 +69,29 @@ def download_file(file_name):
                 break
 
 
-# функция отправки файла на сервер
-def upload_file(file_path):
-    with open(file_path, 'rb') as file:
-        while True:
-            file_data = file.read(1024)
-            if not file_data:
-                break
-            sock_client.sendall(file_data)
 
+
+# функция отправки файла на сервер
+def upload_file(file_name, file_flag=True):
+    if file_flag:
+        # создаем путь куда сохраним наш файл
+        destin_path = os.path.join("C:/PYTHON_/_PROJECT_PYTHON/Python_Project_Other/clitent_sock/cacheCL", file_name)
+
+        if find_copy_file(file_name, destin_path):
+            # чтение нового файла и отправка его содержимого клиенту
+            with open(destin_path, 'rb') as file:
+                while True:
+                    file_data = file.read(1024)
+                    if not file_data:
+                        break
+                    sock_client.sendall(file_data)
+    else:
+        with open(file_name, 'rb') as file:
+            while True:
+                file_data = file.read(1024)
+                if not file_data:
+                    break
+                sock_client.sendall(file_data)
 
 
 
@@ -86,6 +128,9 @@ def send_message():
                 перехода в другую директорию сервер возвращает ничего и программа получает соответственно ничего. 
                 Поэтому я решил данную проблему так -]\n""")
             elif answer == 'Клиент отключен':
+                print(f'{colorize(answer.upper(), "red")}\n')
+                break
+            elif answer == 'Сервер был выключен':
                 print(f'{colorize(answer.upper(), "red")}\n')
                 break
             else:
