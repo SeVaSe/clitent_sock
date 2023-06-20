@@ -12,6 +12,8 @@ def colorize(text, color_code):
         return f'\033[93m{text}\033[0m'
     elif color_code == 'green':  # Покраска текста в зеленый (успешно)
         return f'\033[92m{text}\033[0m'
+    elif color_code == 'purple':  # Покраска текста в фиолетовый (команды)
+        return f'\033[95m{text}\033[0m'
     else:
         return f'{text}'
 
@@ -22,8 +24,8 @@ sock_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Подключение клиента к серверу
 sock_client.connect((HOST_SERVER, PORT_SERVER))
-print(colorize(f'Клиент был подключен к серверу: HOST - [*{HOST_SERVER}*],  PORT - [*{PORT_SERVER}*]', 'green'), '\n\n')
-
+print(colorize(f'Клиент был подключен к серверу: HOST - [*{HOST_SERVER}*],  PORT - [*{PORT_SERVER}*]', 'green'), '')
+print(f'Чтобы открыть справку по командам, введите - {colorize("document", "purple")}\n\n')
 
 
 
@@ -47,6 +49,7 @@ def find_copy_file(file_name, destin_path):
             shutil.copy2(file_path, destin_path)
             print(f'{colorize("Файл скопирован в дирректорию: ", "green")}{colorize(destin_path, "red")}\n')
             return True
+
     print(f'{colorize("Файл был не найден на данном устройстве!", "red")}')
     return False
 
@@ -54,7 +57,6 @@ def find_copy_file(file_name, destin_path):
 def download_file(file_name):
     # Отправка команды на сервер для загрузки файла
     sock_client.sendall(f'download {file_name}'.encode('utf-8'))
-    sock_path = sock_client.recv(1024)
 
     # Прием файла от сервера
     with open(file_name, 'wb') as file:
@@ -105,7 +107,13 @@ def send_message():
         # Отправка команды
         sock_client.sendall(cmd.encode('utf-8'))
 
-        if cmd.startswith('download'):
+
+        flag_answer_doc = True # флаг для отслежки что использовалась документация
+        if cmd == 'document':
+            print(sock_client.recv(1024).decode('utf-8') + '\n')
+            flag_answer_doc = False
+
+        elif cmd.startswith('download'):
             _, file_name = cmd.split(' ', 1)
             download_file(file_name)
             print(f'Файл был успешно загружен на клиент\n')
@@ -115,6 +123,7 @@ def send_message():
             upload_file(file_path)
             print(f'Файл был успешно отправлен на сервер\n')
             continue
+
 
 
         readable, _, _ = select.select([sock_client], [], [], 1.0)  # Ожидание в течение 1 секунды
@@ -134,7 +143,10 @@ def send_message():
                 print(f'{colorize(answer.upper(), "red")}\n')
                 break
             else:
-                print(f'{colorize("Ответ сервера: ", "green")}[- {answer.strip()} -]\n')
+                if flag_answer_doc:
+                    print(f'{colorize("Ответ сервера: ", "green")}[- {answer.strip()} -]\n')
+                else:
+                    continue
         else:
             print(colorize("""Ответ сервера: [- Пусто, это не ошибка! Просто сервер не может вернуть пустое значение, 
             поэтому чтобы клиент не зависал, пришлось сделать вывод этого сообщения. Например, когда вы вводите команду 
