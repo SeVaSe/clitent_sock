@@ -149,7 +149,6 @@ def send_cmd(sock_client):
         # Отправка команды
 
 
-
         flag_answer_doc = True  # флаг для отслежки что использовалась документация
         if cmd == 'document':
             print(sock_client.recv(1024).decode('utf-8') + '\n')
