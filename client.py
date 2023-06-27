@@ -35,7 +35,7 @@ print(f'Чтобы открыть справку по командам, введ
 # поиск файла и копирование
 def find_copy_file(file_name, destin_path):
     # проверка файла, на то, что есть ли он в текущей дирректории
-    destin_file_now = os.path.join("C:\PYTHON_\_PROJECT_PYTHON\Python_Project_Other\clitent_sock", file_name)
+    destin_file_now = os.path.join("C:/PYTHON_/_PROJECT_PYTHON/Python_Project_Other/clitent_sock", file_name)
     if os.path.exists(destin_file_now):
         print(f'{colorize("Файл уже существует в целевой директории: ", "green")}{colorize(destin_path, "red")}\n')
         return upload_file(file_name, file_flag=False)
